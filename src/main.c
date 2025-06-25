@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <raylib.h>
 
 bool IsVector2Equal(Vector2 v1, Vector2 v2) {
@@ -26,6 +27,8 @@ int main() {
 	Vector2 ApplePos;
 	ApplePos.x = GetRandomValue(0, 15);
 	ApplePos.y = GetRandomValue(0, 15);
+
+	int Points = 0;
 
 	float elapsedTime = 0.0f;
 
@@ -61,13 +64,21 @@ int main() {
 		if(IsVector2Equal(PlayerPos, ApplePos)) {
 			ApplePos.x = GetRandomValue(0, 15);
 			ApplePos.y = GetRandomValue(0, 15);
+
+			Points++;
 		}
 
 		//GameScreen Drawing
 		BeginTextureMode(GameScreen);
 		ClearBackground(BROWN);
 		
-		DrawPixelV(PlayerPos, RED);
+		DrawPixelV(PlayerPos, GREEN);
+		
+		DrawPixelV(ApplePos, RED);
+
+		char TextBuffer[64];
+		sprintf(TextBuffer, "%d", Points);
+		DrawText(TextBuffer, 10, 10, 100, BLACK);
 
 		EndTextureMode();
 
