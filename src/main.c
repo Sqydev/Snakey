@@ -20,8 +20,12 @@ int main() {
 
 	float Difficulty = 1.0f;
 
+	int TailSize = 0;
+
 	Vector2 PlayerDir = {1, 0};
-	Vector2 PlayerPos = {4, 10};
+	Vector2 PlayerPos[256];
+	PlayerPos[0].x = 4;
+	PlayerPos[0].y = 10;
 
 	Vector2 ApplePos;
 	ApplePos.x = GetRandomValue(0, 15);
@@ -37,8 +41,28 @@ int main() {
 
 		//Calcs to make only one time a sec
 		if(elapsedTime >= 1.0f / Difficulty) {
-			PlayerPos = SumVector2(PlayerPos, PlayerDir);
+			//Apple Collision
+			if(IsVector2Equal(PlayerPos[0], ApplePos)) {
+				ApplePos.x = GetRandomValue(0, 15);
+				ApplePos.y = GetRandomValue(0, 15);
 			
+				if(TailSize < 256) TailSize++;
+			}
+			else {
+				for(int i = 0; i < 256; i++) {
+					if(IsVector2Equal(PlayerPos[i], ApplePos)) {
+						ApplePos.x = GetRandomValue(0, 15);
+						ApplePos.y = GetRandomValue(0, 15);
+					}
+				}
+			}
+
+			for(int i = TailSize; i != 0; i--) {
+				PlayerPos[i].x = PlayerPos[i - 1].x;
+				PlayerPos[i].y = PlayerPos[i - 1].y;
+			}
+			PlayerPos[0] = SumVector2(PlayerPos[0], PlayerDir);
+		
 			elapsedTime -= 1.0f / Difficulty;
 		}
 
@@ -61,16 +85,10 @@ int main() {
 		}
 
 		//Out of bounce coll check and action
-		if(PlayerPos.x == 16) PlayerPos.x = 0;
-		if(PlayerPos.x == -1) PlayerPos.x = 15;
-		if(PlayerPos.y == 16) PlayerPos.y = 0;
-		if(PlayerPos.y == -1) PlayerPos.y = 15;
-
-		//Apple Collision
-		if(IsVector2Equal(PlayerPos, ApplePos)) {
-			ApplePos.x = GetRandomValue(0, 15);
-			ApplePos.y = GetRandomValue(0, 15);
-		}
+		if(PlayerPos[0].x == 16) PlayerPos[0].x = 0;
+		if(PlayerPos[0].x == -1) PlayerPos[0].x = 15;
+		if(PlayerPos[0].y == 16) PlayerPos[0].y = 0;
+		if(PlayerPos[0].y == -1) PlayerPos[0].y = 15;
 
 		//Difficulty Thingie
 		if(MouseWheelDelta >= 0.0f) Difficulty += 0.5;
@@ -80,9 +98,13 @@ int main() {
 		BeginTextureMode(GameScreen);
 		ClearBackground(BROWN);
 		
-		DrawPixelV(PlayerPos, GREEN);
-		
 		DrawPixelV(ApplePos, RED);
+		
+		for(int i = 1; i <= TailSize; i++) {
+			DrawPixelV(PlayerPos[i], GREEN);
+		}
+
+		DrawPixelV(PlayerPos[0], BLUE);
 
 		EndTextureMode();
 
