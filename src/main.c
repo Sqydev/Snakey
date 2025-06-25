@@ -1,5 +1,9 @@
 #include <raylib.h>
 
+bool IsVector2Equal(Vector2 v1, Vector2 v2) {
+	return v1.x == v2.x && v1.y == v2.y;
+}
+
 Vector2 SumVector2(Vector2 v1, Vector2 v2) {
 	Vector2 RETURNER = {v1.x + v2.x, v1.y + v2.y};
 	return RETURNER;
@@ -18,6 +22,10 @@ int main() {
 
 	Vector2 PlayerDir = {1, 0};
 	Vector2 PlayerPos = {4, 10};
+
+	Vector2 ApplePos;
+	ApplePos.x = GetRandomValue(0, 15);
+	ApplePos.y = GetRandomValue(0, 15);
 
 	float elapsedTime = 0.0f;
 
@@ -48,6 +56,11 @@ int main() {
 		if(IsKeyDown(KEY_D)) {
 			PlayerDir.x = 1;
 			PlayerDir.y = 0;
+		}
+
+		if(IsVector2Equal(PlayerPos, ApplePos)) {
+			ApplePos.x = GetRandomValue(0, 15);
+			ApplePos.y = GetRandomValue(0, 15);
 		}
 
 		//GameScreen Drawing
