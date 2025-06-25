@@ -1,4 +1,6 @@
 #include <raylib.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 bool IsVector2Equal(Vector2 v1, Vector2 v2) {
 	return v1.x == v2.x && v1.y == v2.y;
@@ -9,8 +11,12 @@ Vector2 SumVector2(Vector2 v1, Vector2 v2) {
 	return RETURNER;
 }
 
+float WindowWidth = 640.0f;
+float WindowHight = 640.0f;
+float WindowScale = 1.0f;
+
 int main() {
-	InitWindow(640, 640, "Snakey");
+	InitWindow(WindowWidth * WindowScale, WindowHight * WindowScale, "Snakey");
 	SetTargetFPS(60);
 
 	//Make game screen
@@ -32,6 +38,8 @@ int main() {
 	ApplePos.y = GetRandomValue(0, 15);
 
 	float elapsedTime = 0.0f;
+
+	bool IsRunning = true;
 
 	while(!WindowShouldClose()) {
 		//Calculations
@@ -57,12 +65,13 @@ int main() {
 				}
 			}
 
+			//New tail maker
 			for(int i = TailSize; i != 0; i--) {
 				PlayerPos[i].x = PlayerPos[i - 1].x;
 				PlayerPos[i].y = PlayerPos[i - 1].y;
 			}
 			PlayerPos[0] = SumVector2(PlayerPos[0], PlayerDir);
-		
+
 			elapsedTime -= 1.0f / Difficulty;
 		}
 
@@ -111,17 +120,24 @@ int main() {
 
 		//GameScreen to Window Drawing
 		BeginDrawing();
-		ClearBackground(WHITE);
+		if(IsRunning) {
+			ClearBackground(WHITE);
 
-		DrawTexturePro(
-    		GameScreen.texture,
-    		(Rectangle){ 0, 0, 16, -16 },
-			(Rectangle){ 0, 0, 640, 640 },
-			(Vector2){ 0, 0 },
-    		0.0f,
-    		WHITE
-		);
-
+			DrawTexturePro(
+    			GameScreen.texture,
+    			(Rectangle){ 0, 0, 16, -16 },
+				(Rectangle){ 0, 0, 640, 640 },
+				(Vector2){ 0, 0 },
+    			0.0f,
+    			WHITE
+			);
+		}
+		else {
+			//Tu zrób żeby się ładniej wyświetlało
+			char TextBuffer[64];
+			sprintf(TextBuffer, "%d", TailSize);
+			DrawText(TextBuffer, 100, 100, 100, BLACK);
+		}
 		EndDrawing();
 	}
 
