@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <raylib.h>
 
 bool IsVector2Equal(Vector2 v1, Vector2 v2) {
@@ -24,17 +23,18 @@ int main() {
 	Vector2 PlayerDir = {1, 0};
 	Vector2 PlayerPos = {4, 10};
 
+	int Points;
+
 	Vector2 ApplePos;
 	ApplePos.x = GetRandomValue(0, 15);
 	ApplePos.y = GetRandomValue(0, 15);
-
-	int Points = 0;
 
 	float elapsedTime = 0.0f;
 
 	while(!WindowShouldClose()) {
 		//Calculations
 		float dt = GetFrameTime();
+		float MouseWheelDelta = GetMouseWheelMoveV().y;
 		elapsedTime += dt;
 
 		//Calcs to make only one time a sec
@@ -44,6 +44,7 @@ int main() {
 			elapsedTime -= 1.0f / Difficulty;
 		}
 
+		//Movement
 		if(IsKeyDown(KEY_W)) {
 			PlayerDir.x = 0;
 			PlayerDir.y = -1;
@@ -61,12 +62,23 @@ int main() {
 			PlayerDir.y = 0;
 		}
 
+		//Out of bounce coll check and action
+		if(PlayerPos.x == 16) PlayerPos.x = 0;
+		if(PlayerPos.x == -1) PlayerPos.x = 15;
+		if(PlayerPos.y == 16) PlayerPos.y = 0;
+		if(PlayerPos.y == -1) PlayerPos.y = 15;
+
+		//Apple Collision
 		if(IsVector2Equal(PlayerPos, ApplePos)) {
 			ApplePos.x = GetRandomValue(0, 15);
 			ApplePos.y = GetRandomValue(0, 15);
 
 			Points++;
 		}
+
+		//Difficulty Thingie
+		if(MouseWheelDelta >= 0.0f) Difficulty += 0.5;
+		if(MouseWheelDelta <= 0.0f && Difficulty > 1.0f) Difficulty -= 0.5;
 
 		//GameScreen Drawing
 		BeginTextureMode(GameScreen);
@@ -75,10 +87,6 @@ int main() {
 		DrawPixelV(PlayerPos, GREEN);
 		
 		DrawPixelV(ApplePos, RED);
-
-		char TextBuffer[64];
-		sprintf(TextBuffer, "%d", Points);
-		DrawText(TextBuffer, 10, 10, 100, BLACK);
 
 		EndTextureMode();
 
