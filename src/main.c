@@ -23,8 +23,6 @@ int main() {
 	Vector2 PlayerDir = {1, 0};
 	Vector2 PlayerPos = {4, 10};
 
-	int Points;
-
 	Vector2 ApplePos;
 	ApplePos.x = GetRandomValue(0, 15);
 	ApplePos.y = GetRandomValue(0, 15);
@@ -72,8 +70,6 @@ int main() {
 		if(IsVector2Equal(PlayerPos, ApplePos)) {
 			ApplePos.x = GetRandomValue(0, 15);
 			ApplePos.y = GetRandomValue(0, 15);
-
-			Points++;
 		}
 
 		//Difficulty Thingie
