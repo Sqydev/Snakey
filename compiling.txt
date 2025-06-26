@@ -5,7 +5,8 @@ gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.bin -lraylib && ./compiled
 gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.out -lraylib
 
 # Full compiling for Windows:
-gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.exe -lraylib
+# gcc-win is alias for x86_64-w64-mingw32-gcc
+gcc-win ~/projects/c/Snakey/src/main.c -o compiled/Snakey.exe -lraylib
 
 # Full compiling for all platforms:
-gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.bin -lraylib && gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.exe -lraylib
+gcc ~/projects/c/Snakey/src/main.c -o compiled/Snakey.bin -lraylib && gcc-win ~/projects/c/Snakey/src/main.c -o compiled/Snakey.exe -lraylib
