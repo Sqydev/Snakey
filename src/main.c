@@ -15,6 +15,14 @@ float WindowHight = 640.0f;
 float WindowScale = 1.0f;
 
 int main() {
+	//Colors palete
+	Color EBitDarkBrown = (Color){68, 34, 0, 255};
+	Color EBitBrown = (Color){136, 68, 0, 255};
+	Color EBitRed = (Color){204, 0, 0, 255};
+	Color EBitDarkGreen = (Color){68, 102, 0, 255};
+	Color EBitBlue = (Color){34, 34, 238, 255};
+	Color EBitDarkBlue = (Color){0, 34, 136, 255};
+
 	InitWindow(WindowWidth * WindowScale, WindowHight * WindowScale, "Snakey");
 	SetTargetFPS(60);
 
@@ -56,6 +64,7 @@ int main() {
 					ApplePos.y = GetRandomValue(0, 15);
 				
 					if(TailSize < 256) TailSize++;
+					else IsRunning = false;
 				}
 				else {
 					for(int i = 0; i < 256; i++) {
@@ -114,15 +123,23 @@ int main() {
 
 		//GameScreen Drawing
 		BeginTextureMode(GameScreen);
-		ClearBackground(BROWN);
+		//Clear
+		ClearBackground(EBitBrown);
 		
-		DrawPixelV(ApplePos, RED);
-		
-		for(int i = 1; i <= TailSize; i++) {
-			DrawPixelV(PlayerPos[i], GREEN);
+		//Do chessboard thing
+		for(int i = 0; i < 16; i++) {
+			for(int j = 0; j < 16; j++) {
+				if(i == 0 || i == 15 || j == 0 || j == 15) DrawPixel(i, j, EBitDarkBrown);
+			}
 		}
 
-		DrawPixelV(PlayerPos[0], BLUE);
+		DrawPixelV(ApplePos, EBitRed);
+		
+		for(int i = 1; i <= TailSize; i++) {
+			DrawPixelV(PlayerPos[i], EBitDarkGreen);
+		}
+
+		DrawPixelV(PlayerPos[0], EBitBlue);
 
 		if(!IsRunning) {
 			//Do score showing thing
