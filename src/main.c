@@ -1,6 +1,5 @@
 #include <raylib.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 bool IsVector2Equal(Vector2 v1, Vector2 v2) {
 	return v1.x == v2.x && v1.y == v2.y;
@@ -24,7 +23,7 @@ int main() {
 	//Make is so It's not blured
 	SetTextureFilter(GameScreen.texture, TEXTURE_FILTER_POINT);
 
-	float Difficulty = 1.0f;
+	float Difficulty = 3.0f;
 
 	int TailSize = 0;
 
@@ -43,65 +42,75 @@ int main() {
 
 	while(!WindowShouldClose()) {
 		//Calculations
-		float dt = GetFrameTime();
-		float MouseWheelDelta = GetMouseWheelMoveV().y;
-		elapsedTime += dt;
+		if(IsRunning) {
+			//Do things as delta time, MouseWheelDelta and elapsedTime
+			float dt = GetFrameTime();
+			float MouseWheelDelta = GetMouseWheelMoveV().y;
+			elapsedTime += dt;
 
-		//Calcs to make only one time a sec
-		if(elapsedTime >= 1.0f / Difficulty) {
-			//Apple Collision
-			if(IsVector2Equal(PlayerPos[0], ApplePos)) {
-				ApplePos.x = GetRandomValue(0, 15);
-				ApplePos.y = GetRandomValue(0, 15);
-			
-				if(TailSize < 256) TailSize++;
-			}
-			else {
-				for(int i = 0; i < 256; i++) {
-					if(IsVector2Equal(PlayerPos[i], ApplePos)) {
-						ApplePos.x = GetRandomValue(0, 15);
-						ApplePos.y = GetRandomValue(0, 15);
+			//Calcs to make only one time a sec
+			if(elapsedTime >= 1.0f / Difficulty) {
+				//Apple Collision
+				if(IsVector2Equal(PlayerPos[0], ApplePos)) {
+					ApplePos.x = GetRandomValue(0, 15);
+					ApplePos.y = GetRandomValue(0, 15);
+				
+					if(TailSize < 256) TailSize++;
+				}
+				else {
+					for(int i = 0; i < 256; i++) {
+						if(IsVector2Equal(PlayerPos[i], ApplePos)) {
+							ApplePos.x = GetRandomValue(0, 15);
+							ApplePos.y = GetRandomValue(0, 15);
+						}
 					}
 				}
+
+				//New tail maker
+				for(int i = TailSize; i != 0; i--) {
+					PlayerPos[i].x = PlayerPos[i - 1].x;
+					PlayerPos[i].y = PlayerPos[i - 1].y;
+				}
+				PlayerPos[0] = SumVector2(PlayerPos[0], PlayerDir);
+
+				
+				//This one checks if you touched yourself and if so you dies
+				for(int i = 1; i < TailSize; i++) {
+					if(IsVector2Equal(PlayerPos[0], PlayerPos[i])) IsRunning = false;
+				}
+
+				elapsedTime -= 1.0f / Difficulty;
 			}
 
-			//New tail maker
-			for(int i = TailSize; i != 0; i--) {
-				PlayerPos[i].x = PlayerPos[i - 1].x;
-				PlayerPos[i].y = PlayerPos[i - 1].y;
+			//Movement everything self expenencial
+			if(IsKeyPressed(KEY_W) && PlayerDir.y != 1) {
+				PlayerDir.x = 0;
+				PlayerDir.y = -1;
 			}
-			PlayerPos[0] = SumVector2(PlayerPos[0], PlayerDir);
+			if(IsKeyPressed(KEY_S) && PlayerDir.y != -1) {
+				PlayerDir.x = 0;
+				PlayerDir.y = 1;
+			}
+			if(IsKeyPressed(KEY_A) && PlayerDir.x != 1) {
+				PlayerDir.x = -1;
+				PlayerDir.y = 0;
+			}
+			if(IsKeyPressed(KEY_D) && PlayerDir.x != -1) {
+				PlayerDir.x = 1;
+				PlayerDir.y = 0;
+			}
 
-			elapsedTime -= 1.0f / Difficulty;
-		}
 
-		//Movement
-		if(IsKeyDown(KEY_W)) {
-			PlayerDir.x = 0;
-			PlayerDir.y = -1;
-		}
-		if(IsKeyDown(KEY_S)) {
-			PlayerDir.x = 0;
-			PlayerDir.y = 1;
-		}
-		if(IsKeyDown(KEY_A)) {
-			PlayerDir.x = -1;
-			PlayerDir.y = 0;
-		}
-		if(IsKeyDown(KEY_D)) {
-			PlayerDir.x = 1;
-			PlayerDir.y = 0;
-		}
+			//Out of bounce collision check and reaction
+			if(PlayerPos[0].x == 16) PlayerPos[0].x = 0;
+			if(PlayerPos[0].x == -1) PlayerPos[0].x = 15;
+			if(PlayerPos[0].y == 16) PlayerPos[0].y = 0;
+			if(PlayerPos[0].y == -1) PlayerPos[0].y = 15;
 
-		//Out of bounce coll check and action
-		if(PlayerPos[0].x == 16) PlayerPos[0].x = 0;
-		if(PlayerPos[0].x == -1) PlayerPos[0].x = 15;
-		if(PlayerPos[0].y == 16) PlayerPos[0].y = 0;
-		if(PlayerPos[0].y == -1) PlayerPos[0].y = 15;
-
-		//Difficulty Thingie
-		if(MouseWheelDelta >= 0.0f) Difficulty += 0.5;
-		if(MouseWheelDelta <= 0.0f && Difficulty > 1.0f) Difficulty -= 0.5;
+			//Difficulty input thing
+			if(MouseWheelDelta >= 0.0f) Difficulty += 0.5;
+			if(MouseWheelDelta <= 0.0f && Difficulty > 1.0f) Difficulty -= 0.5;
+		}
 
 		//GameScreen Drawing
 		BeginTextureMode(GameScreen);
@@ -115,29 +124,26 @@ int main() {
 
 		DrawPixelV(PlayerPos[0], BLUE);
 
+		if(!IsRunning) {
+			//Do score showing thing
+			DrawPixel(10, 10, BLACK);
+		}
+
 		EndTextureMode();
 
 
 		//GameScreen to Window Drawing
 		BeginDrawing();
-		if(IsRunning) {
-			ClearBackground(WHITE);
+		ClearBackground(WHITE);
 
-			DrawTexturePro(
-    			GameScreen.texture,
-    			(Rectangle){ 0, 0, 16, -16 },
-				(Rectangle){ 0, 0, 640, 640 },
-				(Vector2){ 0, 0 },
-    			0.0f,
-    			WHITE
-			);
-		}
-		else {
-			//Tu zrób żeby się ładniej wyświetlało
-			char TextBuffer[64];
-			sprintf(TextBuffer, "%d", TailSize);
-			DrawText(TextBuffer, 100, 100, 100, BLACK);
-		}
+		DrawTexturePro(
+    		GameScreen.texture,
+    		(Rectangle){ 0, 0, 16, -16 },
+			(Rectangle){ 0, 0, 640, 640 },
+			(Vector2){ 0, 0 },
+    		0.0f,
+    		WHITE
+		);
 		EndDrawing();
 	}
 
