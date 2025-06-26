@@ -96,7 +96,6 @@ int main() {
 				elapsedTime -= 1.0f / Difficulty;
 			}
 
-
 			//Movement everything self expenencial
 			if(IsKeyDown(KEY_A) && PlayerDirThisScreen.x != 1) {
 				PlayerDir.x = -1;
