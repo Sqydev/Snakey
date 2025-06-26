@@ -19,12 +19,13 @@ int main() {
 	Color EBitDarkBrown = (Color){68, 34, 0, 255};
 	Color EBitBrown = (Color){136, 68, 0, 255};
 	Color EBitRed = (Color){204, 0, 0, 255};
-	Color EBitDarkGreen = (Color){68, 102, 0, 255};
+	Color EBitGreen = (Color){68, 102, 0, 255};
+	Color EBitDarkGreen = (Color){0, 68, 0, 255};
 	Color EBitBlue = (Color){34, 34, 238, 255};
 	Color EBitDarkBlue = (Color){0, 34, 136, 255};
 
 	InitWindow(WindowWidth * WindowScale, WindowHight * WindowScale, "Snakey");
-	SetTargetFPS(60);
+	SetTargetFPS(165);
 
 	//Make game screen
 	RenderTexture2D GameScreen = LoadRenderTexture(16, 16);
@@ -35,6 +36,7 @@ int main() {
 
 	int TailSize = 0;
 
+	Vector2 PlayerDirThisScreen;
 	Vector2 PlayerDir = {1, 0};
 	Vector2 PlayerPos[256];
 	PlayerPos[0].x = 4;
@@ -56,8 +58,11 @@ int main() {
 			float MouseWheelDelta = GetMouseWheelMoveV().y;
 			elapsedTime += dt;
 
-			//Calcs to make only one time a sec
+			//Calcs to make only one time a sec(or less)
 			if(elapsedTime >= 1.0f / Difficulty) {
+				//Movement seftey
+				PlayerDirThisScreen = PlayerDir;
+
 				//Apple Collision
 				if(IsVector2Equal(PlayerPos[0], ApplePos)) {
 					ApplePos.x = GetRandomValue(0, 15);
@@ -87,28 +92,28 @@ int main() {
 				for(int i = 1; i < TailSize; i++) {
 					if(IsVector2Equal(PlayerPos[0], PlayerPos[i])) IsRunning = false;
 				}
-
+			
 				elapsedTime -= 1.0f / Difficulty;
 			}
 
+
 			//Movement everything self expenencial
-			if(IsKeyPressed(KEY_W) && PlayerDir.y != 1) {
-				PlayerDir.x = 0;
-				PlayerDir.y = -1;
-			}
-			if(IsKeyPressed(KEY_S) && PlayerDir.y != -1) {
-				PlayerDir.x = 0;
-				PlayerDir.y = 1;
-			}
-			if(IsKeyPressed(KEY_A) && PlayerDir.x != 1) {
+			if(IsKeyDown(KEY_A) && PlayerDirThisScreen.x != 1) {
 				PlayerDir.x = -1;
 				PlayerDir.y = 0;
 			}
-			if(IsKeyPressed(KEY_D) && PlayerDir.x != -1) {
+			if(IsKeyDown(KEY_W) && PlayerDirThisScreen.y != 1) {
+				PlayerDir.x = 0;
+				PlayerDir.y = -1;
+			}
+			if(IsKeyDown(KEY_D) && PlayerDirThisScreen.x != -1) {
 				PlayerDir.x = 1;
 				PlayerDir.y = 0;
 			}
-
+			if(IsKeyDown(KEY_S) && PlayerDirThisScreen.y != -1) {
+				PlayerDir.x = 0;
+				PlayerDir.y = 1;
+			}
 
 			//Out of bounce collision check and reaction
 			if(PlayerPos[0].x == 16) PlayerPos[0].x = 0;
@@ -136,7 +141,8 @@ int main() {
 		DrawPixelV(ApplePos, EBitRed);
 		
 		for(int i = 1; i <= TailSize; i++) {
-			DrawPixelV(PlayerPos[i], EBitDarkGreen);
+			if(i % 2) DrawPixelV(PlayerPos[i], EBitDarkGreen);
+			else DrawPixelV(PlayerPos[i], EBitGreen);
 		}
 
 		DrawPixelV(PlayerPos[0], EBitBlue);
