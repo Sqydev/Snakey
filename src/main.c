@@ -38,7 +38,7 @@ int main() {
 	Vector2 PlayerDir = {1, 0};
 	Vector2 PlayerPos[256];
 	PlayerPos[0].x = 4;
-	PlayerPos[0].y = 10;
+	PlayerPos[0].y = 7;
 
 	Vector2 ApplePos;
 	ApplePos.x = GetRandomValue(0, 15);
@@ -143,7 +143,14 @@ int main() {
 
 		if(!IsRunning) {
 			//Do score showing thing
-			DrawPixel(10, 10, BLACK);
+			for(int i = 0; i <= 7; i++) {
+				if(IsMouseButtonPressed(i)) {
+					TailSize = 0;
+					PlayerPos[0].x = 4;
+					PlayerPos[0].y = 7;
+					IsRunning = true;
+				}
+			}
 		}
 
 		EndTextureMode();
